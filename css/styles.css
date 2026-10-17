@@ -24,7 +24,6 @@ input,select{background:var(--bg);border:1px solid var(--line);color:var(--text)
 .dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none}
 .task{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
 .task.done span{text-decoration:line-through;color:var(--mut)}
-.task span{flex:1}
 .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
 .day{border:1px solid var(--line);border-radius:12px;padding:10px;min-height:150px;background:var(--panel);font-size:13px;overflow:hidden}
 .day.today{border-color:var(--acc)}
@@ -56,8 +55,9 @@ input,select{background:var(--bg);border:1px solid var(--line);color:var(--text)
 .pill{background:rgba(15,15,15,.55);border-radius:999px;padding:8px 14px;display:flex;gap:8px;align-items:center;color:#fff}
 .pill select{background:none;border:0;color:#fff;padding:0;font-weight:700;max-width:160px}
 .pill option{color:#1d1b18}
-.mid{position:absolute;inset:0 380px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:60px}
-.dial{position:relative;width:min(340px,60vw);aspect-ratio:1}
+.mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 0 110px;pointer-events:none}
+.mid>*{pointer-events:auto}
+.dial{position:relative;width:min(60vw,clamp(180px,calc(100vh - 450px),340px));aspect-ratio:1}
 .dial svg{width:100%;display:block}
 .dial .trk{fill:none;stroke:rgba(255,255,255,.32);stroke-width:8}
 .dial .prg{fill:none;stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-dasharray:879.6;stroke-dashoffset:879.6}
@@ -126,3 +126,10 @@ body[data-v=timer] #yt.bg iframe{position:absolute;top:50%;left:50%;width:max(10
 #auth.on{display:flex}
 #auth .ac{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:24px;width:min(380px,100%);display:flex;flex-direction:column;gap:12px}
 #auth .ac h1{margin:0}
+/* timer tepat di tengah; geser ke kiri hanya saat daftar tugas terbuka agar tidak tertutup */
+@media(min-width:721px) and (max-width:1199px){.stage:has(.tl:not(.c)) .mid{right:380px}}
+/* edit task: past time */
+.tl .ed .pt{display:flex;flex-direction:column;gap:6px}
+.tl .ed .pt b{font-size:14px}
+.tl .ed .row input{width:auto;flex:1;min-width:0}
+.ev.task{background:color-mix(in srgb,var(--bg) 85%,var(--acc))}

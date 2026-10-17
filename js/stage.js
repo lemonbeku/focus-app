@@ -5,7 +5,7 @@ let editId=null;
 const tmr=()=>{const d=new Date();d.setDate(d.getDate()+1);return dk(d)};
 const tById=id=>S.tasks.find(x=>String(x.id)===String(id));
 function editForm(t){
-  return `<div class="ed"><input data-et value="${esc(t.title)}" aria-label="Task title"><select data-ep aria-label="Project">${popts()}</select><input data-edt type="date" value="${t.due||dk(new Date())}" aria-label="Due date"><div class="row" style="justify-content:space-between"><button class="edel" data-edel>Delete</button><span><button class="g" data-ecx>Cancel</button> <button class="p" data-esv>Save</button></span></div></div>`;
+  return `<div class="ed"><input data-et value="${esc(t.title)}" aria-label="Task title"><select data-ep aria-label="Project">${popts()}</select><input data-edt type="date" value="${t.due||dk(new Date())}" aria-label="Due date"><div class="pt"><b>Add past time</b><div class="row"><input data-eh type="number" min="0" step="0.25" placeholder="Hours (e.g. 1.5)" aria-label="Past hours"><input data-eps type="date" value="${dk(new Date())}" aria-label="Date worked"></div><small>Logged to this task on that date. Now: ${fmt(tmin(t.id))}</small></div><div class="row" style="justify-content:space-between"><button class="edel" data-edel>Delete</button><span><button class="g" data-ecx>Cancel</button> <button class="p" data-esv>Save</button></span></div></div>`;
 }
 function renderStage(){
   $('stage').dataset.scene=S.scene||'sunset';
@@ -38,12 +38,18 @@ function renderStage(){
       const v=f.querySelector('[data-et]').value.trim(),np=f.querySelector('[data-ep]').value;
       if(v)t.title=v;
       if(np!==t.project){t.project=np;S.sessions.forEach(s=>{if(s.task===String(t.id))s.project=np})}
+      const hv=+f.querySelector('[data-eh]').value;
+      if(hv>0){
+        const dv=f.querySelector('[data-eps]').value||today;
+        S.sessions.push({ts:dv===today?Date.now():new Date(dv+'T12:00:00').getTime(),min:Math.max(1,Math.round(hv*60)),task:String(t.id),project:t.project});
+      }
       t.due=f.querySelector('[data-edt]').value||dk(new Date());
       if(t.due>dk(new Date())&&String(S.curTask)===String(t.id))S.curTask='';
       editId=null;save();render();
     };
     f.querySelector('[data-esv]').onclick=saveEdit;
     f.querySelector('[data-et]').onkeydown=e=>{if(e.key==='Enter')saveEdit()};
+    f.querySelector('[data-eh]').onkeydown=e=>{if(e.key==='Enter')saveEdit()};
     f.querySelector('[data-ecx]').onclick=()=>{editId=null;renderStage()};
     f.querySelector('[data-edel]').onclick=()=>{if(confirm('Delete this task?')){S.tasks=S.tasks.filter(x=>x!==t);if(String(S.curTask)===String(t.id))S.curTask='';editId=null;save();render()}};
   }
