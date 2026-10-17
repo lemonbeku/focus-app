@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>10,000 Hours Focus</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav aria-label="Sections">
+  <button data-v="timer" class="on">Timer</button>
+  <button data-v="tasks">Projects</button>
+  <button data-v="cal">Calendar</button>
+  <button data-v="hours">10,000h</button>
+</nav>
+<main>
+  <section class="view on" id="timer">
+<div class="stage" id="stage">
+  <div class="top">
+    <b class="ttl">Working Space</b>
+    <label class="pill"><span class="dot" id="pdot"></span><select id="psel" aria-label="Project"></select></label>
+    <span class="pill" title="Day streak">🔥 <span id="tStreak">0</span></span>
+    <span class="pill" title="Focus sessions today">🏆 <span id="tTrophy">0</span></span>
+    <button class="pill" id="vpp" aria-label="Play or pause video" style="display:none">⏯ Video</button>
+  </div>
+  <div class="mid">
+    <div class="ptabs" id="ptabs"><button data-ph="work">Pomodoro</button><button data-ph="short">Short break</button><button data-ph="long">Long break</button></div>
+    <div class="dial" id="dial">
+      <svg viewBox="0 0 300 300" aria-hidden="true"><circle class="trk" cx="150" cy="150" r="140"/><circle class="prg" id="prg" cx="150" cy="150" r="140" transform="rotate(-90 150 150)"/><circle id="knob" r="10" cx="150" cy="10"/></svg>
+      <div class="dtxt"><div class="clock" id="clock">25:00</div><div id="mode">POMODORO</div></div>
+    </div>
+    <div class="ctl"><button class="start" id="go">▶ Start</button><button class="ic" id="rs" title="Reset (does not log)" aria-label="Reset">↺</button><button class="ic" id="skip" title="Finish and log" aria-label="Finish and log">⏭</button></div>
+    <div class="cur" id="cur"></div>
+  </div>
+  <aside class="tl" id="tl">
+    <div class="row" style="justify-content:space-between"><b style="font-size:20px">Task list</b><button id="tlc" aria-label="Collapse task list">»</button></div>
+    <div class="m3" id="tltot"></div><div id="tlb"></div>
+  </aside>
+  <div class="dock">
+    <button class="dk" data-m="mSnd"><i>🎵</i>Sounds</button>
+    <button class="dk" data-m="mThm"><i>⛺</i>Theme</button>
+    <button class="dk" data-m="mSet"><i>⏱</i>Timer</button>
+    <button class="dk" data-m="mNote"><i>📝</i>Notes</button>
+  </div>
+  <div class="modal" id="mSnd"><div class="mc" id="mSndc"></div></div>
+  <div class="modal" id="mThm"><div class="mc" id="mThmc"></div></div>
+  <div class="modal" id="mSet"><div class="mc" id="mSetc"></div></div>
+  <div class="modal" id="mNote"><div class="mc" id="mNotec"></div></div>
+</div>
+</section>
+
+  <section class="view" id="tasks">
+    <h1>Projects</h1>
+    <div class="card row">
+      <input id="pn" placeholder="New project (e.g. Guitar)" style="flex:1;min-width:160px">
+      <label class="mut">Goal hours <input id="pg" type="number" min="1" value="10000" style="width:100px"></label>
+      <button class="p" id="addp">Add project</button>
+    </div>
+    <div id="plist"></div>
+  </section>
+
+  <section class="view" id="cal">
+    <h1 id="calT">Week</h1>
+    <div class="card row">
+      <input id="pd" type="date" aria-label="Plan date">
+      <select id="pp" aria-label="Plan project"></select>
+      <input id="ptl" placeholder="Plan a block (e.g. Scales practice)" style="flex:1;min-width:150px">
+      <input id="pm" type="number" min="5" value="50" style="width:80px" aria-label="Minutes">
+      <button class="p" id="addplan">Add to calendar</button>
+    </div>
+    <div class="row" style="margin-bottom:12px">
+      <button class="g" id="cp">Previous</button><button class="g" id="cn">Next</button><button class="g" id="ct">Today</button>
+      <select id="cfil" aria-label="Filter by project"></select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="view" id="hours">
+    <h1>Hours by project</h1>
+    <div class="stats" id="stats"></div>
+    <div id="hcards" style="margin-top:14px"></div>
+    <div class="card">
+      <b>Akun</b>
+      <p class="mut" id="accu"></p><p class="mut" id="accs"></p>
+      <button class="g" id="ashow">Login</button><button class="g" id="aout">Logout</button>
+    </div>
+    <div class="card">
+      <b>Backup</b>
+      <p class="mut">Download all your data as a file, or restore it from one.</p>
+      <div class="row"><button class="g" id="bkx">Export backup</button><button class="g" id="bkb">Import backup</button><input type="file" id="bki" accept="application/json,.json" hidden></div>
+    </div>
+    <div class="card"><button class="g" id="reset">Reset all data</button></div>
+  </section>
+</main>
+
+<div id="yt"><div class="hd"><span>Now playing</span><button id="ytm" aria-label="Minimize player">Minimize</button></div><iframe id="ytf" title="YouTube player" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" src="about:blank"></iframe></div>
+
+<div id="auth"><div class="ac">
+  <h1>Masuk</h1>
+  <p class="mut">Login supaya data sinkron di semua perangkat.</p>
+  <input id="ae" type="email" placeholder="Email" autocomplete="email">
+  <input id="ap" type="password" placeholder="Password (min. 6 karakter)" autocomplete="current-password">
+  <div class="row"><button class="p" id="ain">Login</button><button class="g" id="aup">Daftar</button><button class="g" id="askip">Lewati</button></div>
+  <p class="mut" id="amsg"></p>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/store.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/player.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/stage.js"></script>
+<script src="js/modals.js"></script>
+<script src="js/keys.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/backup.js"></script>
+<script src="js/main.js"></script>
+<script src="js/config.js"></script>
+<script src="js/sync.js"></script>
+</body>
+</html>
