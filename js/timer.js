@@ -19,7 +19,34 @@ function draw(){
   const a=f*2*Math.PI-Math.PI/2;$('knob').setAttribute('cx',150+140*Math.cos(a));$('knob').setAttribute('cy',150+140*Math.sin(a));
   document.title=(running?t+' - ':'')+'10,000 Hours Focus';
   syncVideo();
+  saveRun();
 }
+// keep the running/paused timer in the browser so a refresh or closed tab does not lose progress
+const RUN='focus10000run';
+function saveRun(){
+  try{
+    const idle=!running&&(flowNow()?up<=0:left>=span);
+    if(idle){localStorage.removeItem(RUN);return}
+    localStorage.setItem(RUN,JSON.stringify({ph,running,end,startT,left,span,up,round,t:Date.now()}));
+  }catch(e){}
+}
+function restoreRun(){
+  let r=null;try{r=JSON.parse(localStorage.getItem(RUN)||'null')}catch(e){}
+  if(!r||!r.ph)return;
+  ph=r.ph;span=r.span||plen();left=r.left;up=r.up||0;round=r.round||0;
+  if(!r.running)return;                                   // paused: show it where it stopped
+  if(Date.now()-r.t>150000){                              // page was closed: log the time done until the last heartbeat
+    if(r.ph==='work'){
+      const sec=flowNow()?(r.t-r.startT)/1000:r.span-(r.end-r.t)/1000;
+      const n=round;if(logTime(sec))round=n+1;
+    }
+    setPhase('work');return;
+  }
+  if(flowNow()){startT=r.startT;up=(Date.now()-startT)/1000}
+  else{end=r.end;left=(end-Date.now())/1000}
+  running=true;tick=setInterval(loop,500);
+}
+window.addEventListener('pagehide',saveRun);
 // three-note chime
 function beep(){if(!st().sound)return;try{const c=new (window.AudioContext||window.webkitAudioContext)(),t=c.currentTime;
   [660,880,1100].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),s=t+i*.22;o.type='sine';o.frequency.value=f;
@@ -65,3 +92,4 @@ $('skip').onclick=()=>{
   if(ph==='work'){if(logTime(w))round++;goBreak(w)}else setPhase('work');
   render();
 };
+restoreRun();
