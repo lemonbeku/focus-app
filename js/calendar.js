@@ -13,12 +13,14 @@ function renderCal(){
   $('calT').textContent=days[0].toLocaleDateString(undefined,{month:'long',year:'numeric'})+', week of '+days[0].getDate();
   const today=dk(new Date());
   $('grid').innerHTML=days.map(d=>{
-    const k=dk(d),ss=S.sessions.filter(x=>dk(x.ts)===k&&(!f||x.project===f)),pl=S.plans.filter(x=>x.date===k&&(!f||x.project===f)),tot=ss.reduce((a,x)=>a+x.min,0);
+    const k=dk(d),ss=S.sessions.filter(x=>dk(x.ts)===k&&(!f||x.project===f)),pl=S.plans.filter(x=>x.date===k&&(!f||x.project===f)),tk=S.tasks.filter(x=>(!f||x.project===f)&&(x.due===k||(!x.due&&k===today&&!x.done))),tot=ss.reduce((a,x)=>a+x.min,0);
     return `<div class="day ${k===today?'today':''}"><span class="mut">${d.toLocaleDateString(undefined,{weekday:'short'})}</span><b>${d.getDate()}</b><span class="mut">${tot?fmt(tot)+' focused':'No focus yet'}</span>`+
     pl.map(x=>`<div class="ev plan ${x.done?'done':''}" style="border-left-color:${pcol(x.project)}">Plan: ${esc(x.title)} (${x.min}m)<br><button data-pd="${x.id}">${x.done?'Undo':'Done'}</button><button data-px="${x.id}">Remove</button></div>`).join('')+
+    tk.map(x=>`<div class="ev task ${x.done?'done':''}" style="border-left-color:${pcol(x.project)}">Task: ${esc(x.title)}${tmin(x.id)?' ('+fmt(tmin(x.id))+')':''}<br><button data-td="${x.id}">${x.done?'Undo':'Done'}</button></div>`).join('')+
     ss.map(x=>{const t=S.tasks.find(y=>String(y.id)===x.task),h=new Date(x.ts);return `<div class="ev" style="border-left-color:${pcol(x.project)}">${String(h.getHours()).padStart(2,'0')}:${String(h.getMinutes()).padStart(2,'0')} ${x.min}m ${esc((proj(x.project)||{name:''}).name)}${t?': '+esc(t.title):''}</div>`}).join('')+'</div>';
   }).join('');
   document.querySelectorAll('[data-pd]').forEach(b=>b.onclick=()=>{const p=S.plans.find(x=>String(x.id)===b.dataset.pd);p.done=!p.done;save();renderCal()});
+  document.querySelectorAll('[data-td]').forEach(b=>b.onclick=()=>{const t=S.tasks.find(x=>String(x.id)===b.dataset.td);t.done=!t.done;t.doneAt=t.done?dk(new Date()):'';save();renderCal()});
   document.querySelectorAll('[data-px]').forEach(b=>b.onclick=()=>{S.plans=S.plans.filter(x=>String(x.id)!==b.dataset.px);save();renderCal()});
 }
 $('cp').onclick=()=>{wk--;renderCal()};$('cn').onclick=()=>{wk++;renderCal()};$('ct').onclick=()=>{wk=0;renderCal()};

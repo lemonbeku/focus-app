@@ -12,7 +12,7 @@ function renderProjects(){
     `<div class="row" style="margin-top:10px"><input data-ni="${p.id}" placeholder="Add a task" style="flex:1"><button class="p" data-nt="${p.id}">Add task</button></div></div>`;
   }).join('')||'<p class="mut">Add your first project above.</p>';
   const q=s=>document.querySelectorAll(s);
-  q('[data-c]').forEach(c=>c.onchange=()=>{S.tasks.find(x=>String(x.id)===c.dataset.c).done=c.checked;save();render()});
+  q('[data-c]').forEach(c=>c.onchange=()=>{const t=S.tasks.find(x=>String(x.id)===c.dataset.c);t.done=c.checked;t.doneAt=c.checked?dk(new Date()):'';save();render()});
   q('[data-dt]').forEach(b=>b.onclick=()=>{S.tasks=S.tasks.filter(x=>String(x.id)!==b.dataset.dt);save();render()});
   q('[data-dp]').forEach(b=>b.onclick=()=>{if(confirm('Delete this project, its tasks, plans and logged time?')){const id=b.dataset.dp;S.projects=S.projects.filter(p=>p.id!==id);S.tasks=S.tasks.filter(t=>t.project!==id);S.plans=S.plans.filter(t=>t.project!==id);S.sessions=S.sessions.filter(t=>t.project!==id);save();render()}});
   q('[data-nt]').forEach(b=>b.onclick=()=>{const i=document.querySelector(`[data-ni="${b.dataset.nt}"]`),t=i.value.trim();if(!t)return;S.tasks.push({id:Date.now(),title:t,project:b.dataset.nt,done:false});save();render()});

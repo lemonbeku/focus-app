@@ -12,7 +12,8 @@ function renderStage(){
   $('yt').classList.toggle('bg',S.vbg!==false);$('stage').classList.toggle('vbg',S.vbg!==false&&!!S.yt);$('vpp').style.display=S.yt?'':'none';
   $('dial').classList.toggle('num',st().style==='num');
   const today=dk(new Date()),p=proj(S.cur);
-  const ts=S.tasks.filter(t=>!t.due||t.due<=today),later=S.tasks.length-ts.length;
+  // selesai hari ini tetap tampil (bisa di-undo); selesai hari sebelumnya disembunyikan dari daftar
+  const ts=S.tasks.filter(t=>(!t.due||t.due<=today)&&(!t.done||t.doneAt===today)),later=S.tasks.filter(t=>!t.done&&t.due>today).length;
   $('pdot').style.background=pcol(S.cur);
   const cur=tById(S.curTask),cp=cur?proj(cur.project):p;
   $('cur').innerHTML=`<div style="font-size:20px">${cur?esc(cur.title):'No task selected'}</div><div class="row" style="justify-content:space-between;margin:8px 0 0;opacity:.85"><span>Project: ${cp?esc(cp.name):'none'}</span><span>${cur?fmt(tmin(cur.id))+' focused':''}</span></div>`;
@@ -28,7 +29,7 @@ function renderStage(){
   }).join('')+`<input id="qt" placeholder="+ Add new task" aria-label="Add new task">`;
   const L=$('tlb');
   L.querySelectorAll('[data-s]').forEach(r=>r.onclick=()=>{S.curTask=r.dataset.s;save();renderStage()});
-  L.querySelectorAll('[data-k]').forEach(r=>r.onclick=e=>{e.stopPropagation();const t=tById(r.dataset.k);t.done=!t.done;save();render()});
+  L.querySelectorAll('[data-k]').forEach(r=>r.onclick=e=>{e.stopPropagation();const t=tById(r.dataset.k);t.done=!t.done;t.doneAt=t.done?today:'';save();render()});
   L.querySelectorAll('[data-tm]').forEach(b=>b.onclick=e=>{e.stopPropagation();const t=tById(b.dataset.tm);t.due=tmr();if(String(S.curTask)===String(t.id))S.curTask='';save();render()});
   L.querySelectorAll('[data-ed]').forEach(b=>b.onclick=e=>{e.stopPropagation();editId=b.dataset.ed;renderStage()});
   const f=L.querySelector('.ed');
